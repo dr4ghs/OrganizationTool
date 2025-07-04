@@ -1,5 +1,8 @@
 # Project
-data/
+**/pb_data
 **/*.env
 **/Makefile
+
+# Go
+**/go.sum
 

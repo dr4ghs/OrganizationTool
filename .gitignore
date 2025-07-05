@@ -2,7 +2,13 @@
 **/pb_data
 **/*.env
 **/Makefile
+**/bin/
+**/dist/
 
 # Go
 **/go.sum
+**/*_templ.go
+
+# Node.js
+**/node_modules/
 

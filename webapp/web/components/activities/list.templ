@@ -1,0 +1,23 @@
+package activities
+
+import "github.com/dr4ghs/orgtool/webapp/internal"
+
+templ ActivityList(activities []internal.Activity) {
+  <div class="flex flex-col w-screen justify-center items-center">
+    <div id="activities" class="flex-initial w-full sm:w-3/5">
+      for _, a := range activities {
+        @Activity(a, false)
+      }
+      <template x-for="a in OrgTool.activities" 
+                hx-sync="this:queue">
+        <div hx-post="/home/activities"
+             hx-ext="json-enc"
+             hx-trigger="load once"
+             hx-swap="outerHTML"
+             :hx-vals="JSON.stringify(a)">
+        </div>
+      </template>
+    </div>
+    @AddActivityButton()
+  </div>
+}

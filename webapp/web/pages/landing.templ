@@ -1,0 +1,25 @@
+package pages
+
+import "github.com/dr4ghs/orgtool/webapp/web/template"
+
+script preventSwap(e templ.JSExpression) {
+  if (e.detail.xhr.status !== 200) {
+    e.preventDefault();
+  }
+}
+
+templ Landing() {
+  @template.Base() {
+     <a href='/login'>Login</a>
+     <a href='/register'>Register</a>
+ 
+     <div
+       hx-get='/api/auth/login'
+       hx-trigger='load'
+       hx-target='#content'
+       hx-swap='outerHTML'
+       hx-on::before-swap={ preventSwap(templ.JSExpression("event")) }
+       hx-push-url='/home'
+     ></div>
+   }
+ }

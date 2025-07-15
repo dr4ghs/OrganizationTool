@@ -1,0 +1,21 @@
+package components
+
+import "github.com/dr4ghs/orgtool/webapp/web/components/base"
+
+var PopoverCard = base.New().
+  Elevation(8).
+  Type(base.Surface).
+  Rounded().All(base.RoundedLg).
+  AddOuterClass("absolute z-10 mt-2 w-48").
+  Attribute("x-show", "open").Attribute("@click.outside", "open = false")
+
+templ Popover(button templ.Component, attrs templ.Attributes) {
+  <div class="relative flex flex-col items-center" x-data="{ open: false }" { attrs... }>
+    @button
+    <div class="absolute z-10 top-8">
+      @base.Component(PopoverCard) {
+        { children... }
+      }
+    </div>
+  </div>
+}

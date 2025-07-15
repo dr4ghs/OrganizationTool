@@ -1,0 +1,23 @@
+package pages
+
+import "github.com/dr4ghs/orgtool/webapp/web/template"
+
+templ Home() {
+  @template.Base() {
+    <div>
+      <div
+        hx-get='/home/activities'
+        hx-trigger='load once'
+        hx-swap='outerHTML'
+      <button 
+        hx-get='/' 
+        hx-target='#content' 
+        hx-swap='outerHTML'
+        hx-push-url='true'
+        hx-on::before-request='OrgTool.logout()'
+      >
+        Logout
+      </button>
+    </div>
+  }
+}

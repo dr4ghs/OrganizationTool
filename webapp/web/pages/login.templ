@@ -1,0 +1,51 @@
+package pages
+
+import "github.com/dr4ghs/orgtool/webapp/web/template"
+
+script submitLoginForm() {
+  let elem = document.querySelector("#login-form");
+
+  OrgTool.login(Alpine.$data(elem).identity, Alpine.$data(elem).password)
+    .then(() => {
+      htmx.trigger('#login-form', 'submit');
+    })
+    .catch((response) => { 
+      document.querySelector("#message").removeAttribute("hidden");
+    });
+}
+
+templ Login() {
+  @template.Base() {
+    <div 
+      class='m-4'
+      id="login-form"
+      hx-get='/home'
+      hx-target='#content'
+      hx-swap='outerHTML'
+      hx-trigger='submit'
+      hx-push-url='true'
+      x-data="{ identity: '', password: '' }"
+    >
+      <div class="my-2">
+        <label>Email</label>
+        <input type='email' x-model='identity' placeholder='your@email.com' required>
+      </div>
+
+      <div class="my-2">
+        <label>Passowrd</label>
+        <input type='password' x-model='password' required>
+      </div>
+
+      <h1 id='message' class='text-red-500' hidden>Username o password errata</h1>
+
+      <button id="submit" onclick={ submitLoginForm() } class='pt-4 m-auto'>Submit</button>
+    </div>
+
+    <script>
+      document.addEventListener('keyup', (e) => {
+        if (e.code === "Enter")
+          document.getElementById("submit").click();
+      });
+    </script>
+  }
+}

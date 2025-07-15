@@ -1,0 +1,14 @@
+package base
+
+var Card = New().Elevation(1).Rounded().All(RoundedLg)
+
+templ Component(builder *Builder) {
+  <div class={ builder.OuterClass() } 
+       if builder.id != nil {
+         id={*builder.id}
+       }
+       { builder.attrs... }>
+    <div class={ builder.InnerClass() }></div>
+    { children... }
+  </div>
+}

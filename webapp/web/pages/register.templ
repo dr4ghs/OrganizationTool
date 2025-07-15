@@ -1,0 +1,38 @@
+package pages
+
+import "github.com/dr4ghs/orgtool/webapp/web/template"
+
+templ Register() {
+  @template.Base() {
+    <div class='m-4'>
+      <form
+        hx-post='/api/auth/signup'
+        hx-ext='json-enc'
+        hx-target='#content'
+        hx-swap='innerHTML'
+      >
+        <div class="my-2">
+          <label>Email</label>
+          <input type='email' name='email' placeholder='your@email.com' required>
+        </div>
+
+        <div class="my-2">
+          <label>Name</label>
+          <input type='text' name='name' placeholder='Your Username' required>
+        </div>
+
+        <div class="my-2">
+          <label>Passowrd</label>
+          <input type='password' name='password' required>
+        </div>
+
+        <div class="my-2">
+          <label>Confirm</label>
+          <input type='password' name='passwordConfirm' required>
+        </div>
+
+        <button class='pt-4 m-auto' type='submit'>Submit</button>
+      </form>
+    </div>
+  }
+}

@@ -1,0 +1,92 @@
+package activities
+
+import "fmt"
+import "strings"
+import "github.com/dr4ghs/orgtool/webapp/internal"
+import "github.com/dr4ghs/orgtool/webapp/web/components/base"
+import cmp "github.com/dr4ghs/orgtool/webapp/web/components"
+
+var ActivityTypes = []string{
+  "Daily",
+  "Weekly",
+  "Monthly",
+  "Yearly",
+}
+
+var (
+  ActivityBaseCard = 
+    base.Card.Copy().
+      Type(base.Surface).
+      AddOuterClass("relative block flex-initial text-on-surface mb-2")
+
+  AddActivityCard =
+    base.Card.Copy().
+      AddOuterClass("w-full sm:w-3/5 cursor-pointer text-on-surface").
+      AddInnerClass("transition duration-150 ease-in-out group-hover:opacity-10")
+)
+
+templ Activity(a internal.Activity, insert bool) {
+  {{
+    data := fmt.Sprintf("{ mode: 'insert', a: { ...OrgTool.activities.get('%s'), dirty: true } }", a.Id)
+    if !insert {
+      data = fmt.Sprintf("{ mode: 'view', a: { id: '%s', name: '%s', user: '%s', points: %d, goal: '%d', type: '%s' } }", a.Id, a.Name, a.User, a.Points, a.Goal, a.Type)
+    }
+  }}
+
+  @base.Component(ActivityBaseCard.Id(fmt.Sprintf("a_%s", a.Id)).Attribute("x-data", data)) {
+    <div class="p-2">
+      <template x-if="mode === 'view'">
+        @ShowActivity(a)
+      </template>
+      <template x-if="mode === 'insert' || mode === 'edit'">
+        @EditActivity(&a)
+      </template>
+    </div>
+  }
+}
+
+templ ShowActivity(a internal.Activity) {
+  <div class="flex flex-row items-center">
+    @Popover(a)
+    <h5 class="flex-1 mb-2 text-2xl font-bold tracking-tight">{ a.Name }</h5>
+    <div class="w-64 flex flex-row items-center">
+      <p class="flex-1 font-normal text-center"><b>Points</b><br>{ a.Points }</p>
+      <p class="flex-1 font-normal text-center"><b>Goal</b><br>{ a.Goal }</p>
+      <p class="flex-1 font-normal text-center"><b>Type</b><br>{ a.Type }</p>
+    </div>
+  </div>
+}
+
+templ EditActivity(a *internal.Activity) {
+  <div class="flex flew-row items-center">
+    @Popover(*a)
+    <div class="flex-1 flex flex-col">
+      @cmp.TextInput("name", "Name", a.Name, "pr-4 my-2 text-2xl font-bold", templ.Attributes{"x-model": "a.name", "@input": "a.save?.() || (a.dirty = true)"})
+      <div class="flex flex-row pr-4 my-2 text-xl font-bold">
+        @cmp.NumberInput("points", "Points", a.Points, "mr-2", templ.Attributes{"x-model.number": "a.points", "@input": "a.save?.() || (a.dirty = true)"})
+        @cmp.NumberInput("goal", "Goal", a.Goal, "mx-2", templ.Attributes{"x-model.number": "a.goal", "@input": "a.save?.() || (a.dirty = true)"})
+        @cmp.Select("type", "Type", "w-full ml-2", templ.Attributes{"x-model": "a.type", "@change": "a.save?.() || (a.dirty = true)"}) {
+          for _, t := range ActivityTypes {
+            @cmp.Option(strings.ToLower(t), t, a != nil && a.Type == strings.ToLower(t))
+          }
+        }
+      </div>
+    </div>
+  </div>
+}
+
+templ AddActivityButton() {
+  @base.Component(AddActivityCard) {
+    <div class="flex p-4 justify-center items-center"
+         hx-post='/home/activities'
+         hx-ext="json-enc"
+         hx-target="#activities"
+         hx-trigger="click"
+         hx-swap="beforeend"
+         x-data="{ a: {} }"
+         @click="a = OrgTool.activities.new()"
+         :hx-vals="JSON.stringify(a)">
+      <h5 class="m-auto text-3xl text-center material-symbols-outlined">add</h5>
+    </div>
+  }
+}

@@ -11,7 +11,7 @@ templ ActivityPopoverBtn() {
 }
 
 templ ShowActivityPopoverContent(id string) {
-    <div class="p-2">
+    <div class="p-2" x-transition x-ref="popover" x-init="htmx.process($refs.popover)">
       <button class="flex flex-row p-2 w-full transition duration-50 ease-in-out hover:bg-white/10 rounded-md inset-x-auto"
               @click="open = false; mode = 'edit'">
         <div class="flex-none mr-4 material-symbols-outlined">edit</div>
@@ -28,10 +28,11 @@ templ ShowActivityPopoverContent(id string) {
 }
 
 templ EditActivityPopoverContent(id string) {
-    <div class="p-2" x-ref="popover" x-init="htmx.process($refs.popover)">
+    <div class="p-2" x-transition x-ref="popover" x-init="htmx.process($refs.popover)">
       <button class="flex flex-row p-2 w-full transition duration-50 ease-in-out hover:bg-white/10 rounded-md inset-x-auto"
               type="button"
               hx-post="/api/activities"
+              @click="open = false"
               @htmx:config-request="if (!a.dirty) { mode = 'view'; $event.preventDefault() }"
               @htmx:after-request="if (event.detail.xhr.status == 200) a.discard && a.discard()"
               hx-ext="json-enc"
@@ -42,7 +43,7 @@ templ EditActivityPopoverContent(id string) {
         <div class="flex-1 text-left">Save</div>
       </button>
       <button class="flex flex-row p-2 w-full transition duration-50 ease-in-out hover:bg-white/10 rounded-md"
-              @click="a.discard?.(); mode = 'view'">
+              @click="a.discard?.(); mode = 'view'; OrgTool.notify(0, 'Changes discarded')">
         <div class="flex-none mr-4 material-symbols-outlined">close</div>
         <div class="flex-1 text-left">Discard</div>
       </button>

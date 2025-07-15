@@ -4,7 +4,7 @@
 @tailwind utilities;
 
 @source inline("{group-hover:,hover:,}bg-{on-,}{primary,variant,secondary,background,surface,error}");
-@source inline("bg-{primary,variant,secondary,background,surface,error}");
+@source inline("bg-{primary,variant,secondary,background,surface,warning,error}");
 
 @source inline("opacity-[.{05,07,08,09,11,12,14,15,16}]");
 @source inline("shadow-{none,xs,sm,md,lg,{2,}xl}");

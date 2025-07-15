@@ -25,19 +25,19 @@ func (a *Activity) Validate() (err error) {
 	fields := make([]string, 0)
 
 	if a.Name == "" {
-		fields = append(fields, "name")
+		fields = append(fields, "name cannot be empty")
 	}
 
 	if a.User == "" {
-		fields = append(fields, "user")
+		fields = append(fields, "user cannot be empty")
 	}
 
 	if a.Points < 1 {
-		fields = append(fields, "points")
+		fields = append(fields, "points must be greater than 1")
 	}
 
 	if a.Goal < 1 {
-		fields = append(fields, "goal")
+		fields = append(fields, "goal must be greater than 1")
 	}
 
 	if a.Type == "" ||
@@ -45,11 +45,11 @@ func (a *Activity) Validate() (err error) {
 			[]string{"daily", "weekly", "monthly", "yearly"},
 			strings.ToLower(a.Type),
 		) {
-		fields = append(fields, "type")
+		fields = append(fields, fmt.Sprintf("unknown type \"%s\"", a.Type))
 	}
 
 	if len(fields) > 0 {
-		err = fmt.Errorf("Invalid request: %s", strings.Join(fields, ", "))
+		err = fmt.Errorf("Invalid activity: %s", strings.Join(fields, ", "))
 	}
 
 	return err

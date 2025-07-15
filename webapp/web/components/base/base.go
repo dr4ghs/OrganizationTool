@@ -15,6 +15,7 @@ const (
 	Secondary                = "secondary"
 	Background               = "background"
 	Surface                  = "surface"
+	Warning                  = "warning"
 	Error                    = "error"
 )
 

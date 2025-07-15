@@ -68,8 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
         "newActivity-" + this.length,
         "New Activity",
         JSON.parse(localStorage.getItem("user")).id,
-        0,
-        0,
+        1,
+        1,
         "daily"
       );
       a.save();
@@ -84,8 +84,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     get activities() {
       if (!this._activities) {
-        console.log("NEW")
-
         this._activities = new Activities();
         this._activities.init();
       }
@@ -122,8 +120,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
       return Alpine.store("user")
     },
+    notify: (type, message) => fetch("/notification?type=" + type, {
+      method: "GET",
+      headers: {
+        "Content-Type": "text",
+        "X-Notification": message,
+      }
+    })
+    .then((res) => res.text())
+    .then((content) => {
+      document.getElementById("notifications").insertAdjacentHTML("beforeend", content);
+    })
+    .catch((res) => console.log(res))
   }
 
   window.OrgTool = OrgTool
 });
 
+document.body.addEventListener("htmx:afterOnLoad", e => {
+  let type = e.detail.xhr.getResponseHeader("X-Notification")
+  let message = e.detail.xhr.getResponseHeader("X-Notification-Message");
+  
+  if (type != null) OrgTool.notify(type, message);
+});

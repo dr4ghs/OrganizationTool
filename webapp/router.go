@@ -11,9 +11,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/dr4ghs/orgtool/webapp/internal"
 	"github.com/dr4ghs/orgtool/webapp/web/components/activities"
+	"github.com/dr4ghs/orgtool/webapp/web/components/notifications"
 	"github.com/dr4ghs/orgtool/webapp/web/middleware"
 	"github.com/dr4ghs/orgtool/webapp/web/pages"
 )
@@ -48,6 +50,28 @@ func registerRouter(mux *http.ServeMux) {
 	mux.HandleFunc("GET /home/activities", listActivitiesHandler)
 	mux.HandleFunc("POST /home/activities", newActivityHandler)
 
+	// NOTIFICATIONS
+	mux.HandleFunc("GET /notification", func(w http.ResponseWriter, r *http.Request) {
+		typ, err := strconv.Atoi(r.URL.Query().Get("type"))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		if typ < 0 || typ > 2 {
+			http.Error(w, "Wrong notification type", http.StatusBadRequest)
+			return
+		}
+
+		message := r.Header.Get("X-Notification")
+		if message == "" {
+			http.Error(w, "Notification body cannot be empty", http.StatusBadRequest)
+			return
+		}
+
+		middleware.Chain(w, r, notifications.Notification(internal.NotificationType(typ), message))
+	})
+
 	// mux.HandleFunc("POST /api/auth/signup", signUpPageHandler)
 	mux.HandleFunc("GET /api/auth/login", checkLoginHandler)
 	mux.HandleFunc("POST /api/auth/login", loginHandler)
@@ -66,7 +90,6 @@ func registerRouter(mux *http.ServeMux) {
 	})
 
 	mux.HandleFunc("POST /api/activities", createUpdateActivityHandler)
-	// mux.HandleFunc("PATCH /api/activities/{id}", updateActivityHandler)
 	mux.HandleFunc("DELETE /api/activities/{id}", deleteActivityHandler)
 }
 
@@ -281,15 +304,18 @@ func createUpdateActivityHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := a.Validate(); err != nil {
+		internal.AddNotification(w, internal.WarningNotification, err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	if err := a.Save(cookie.Value); err != nil {
+		internal.AddNotification(w, internal.ErrorNotification, err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	internal.AddNotification(w, internal.InfoNotification, "Activity saved")
 	middleware.Chain(w, r, activities.Activity(a, false))
 }
 
@@ -354,10 +380,12 @@ func deleteActivityHandler(w http.ResponseWriter, r *http.Request) {
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
+		internal.AddNotification(w, internal.ErrorNotification, err.Error())
 		http.Error(w, err.Error(), res.StatusCode)
 		return
 	}
 	defer res.Body.Close()
 
+	internal.AddNotification(w, internal.InfoNotification, "Activity deleted")
 	w.WriteHeader(http.StatusOK)
 }

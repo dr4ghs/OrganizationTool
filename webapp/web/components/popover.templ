@@ -7,7 +7,7 @@ var PopoverCard = base.New().
   Type(base.Surface).
   Rounded().All(base.RoundedLg).
   AddOuterClass("absolute z-10 mt-2 w-48").
-  Attribute("x-show", "open").Attribute("@click.outside", "open = false")
+  Attribute("x-show", "open").Attribute("@click.outside", "open = false").Attribute("x-transition", "")
 
 templ Popover(button templ.Component, attrs templ.Attributes) {
   <div class="relative flex flex-col items-center" x-data="{ open: false }" { attrs... }>

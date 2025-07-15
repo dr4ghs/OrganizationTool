@@ -1,0 +1,58 @@
+package notifications
+
+import "github.com/dr4ghs/orgtool/webapp/internal"
+import "github.com/dr4ghs/orgtool/webapp/web/components/base"
+
+var NotificationCard =
+  base.New().
+    Elevation(16).
+    Shadow().
+    Rounded().
+    All(base.RoundedLg).
+    AddOuterClass("relative origin-bottom w-full min-h-20 max-h-48 mt-1").
+    Attribute("x-data", "{ open: false }").
+    Attribute("x-init", "$nextTick(() => open = true); setTimeout(() => open = false, 10000)").
+    Attribute("x-show", "open").
+    Attribute("x-transition:enter", "transition ease-out duration-100").
+    Attribute("x-transition:enter-start", "opacity-0 scale-y-0").
+    Attribute("x-transition:enter-end", "opacity-100 scale-y-100").
+    Attribute("x-transition:leave", "transition ease-in duration-100").
+    Attribute("x-transition:leave-start", "opacity-100 scale-y-100").
+    Attribute("x-transition:leave-end", "opacity-0 scale-y-0")
+
+func NotificationBuilder(typ internal.NotificationType) *base.Builder {
+  b := NotificationCard.Copy()
+  
+  switch typ {
+  case internal.InfoNotification:
+    b.Type(base.Secondary)
+  case internal.WarningNotification:
+    b.Type(base.Warning)
+  case internal.ErrorNotification:
+    b.Type(base.Error)
+  }
+
+  return b
+}
+
+templ NotificationIcon(typ internal.NotificationType) {
+  <div class="flex-none mx-2 text-3xl material-symbols-outlined">
+    switch typ {
+    case internal.InfoNotification:
+      info
+    case internal.WarningNotification:
+      warning
+    case internal.ErrorNotification:
+      error
+    }
+  </div>
+}
+
+templ Notification(typ internal.NotificationType, message string) {
+  @base.Component(NotificationBuilder(typ)) {
+    <div class="flex flex-row p-1 h-full justify-center items-center cursor-pointer" @click="open = false">
+      @NotificationIcon(typ)
+      <p class="flex-1 mr-2">{ message }</p>
+    </div>
+  }
+}

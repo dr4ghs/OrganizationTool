@@ -51,11 +51,11 @@ func addActivityAPIRules(app core.App) error {
 		return err
 	}
 
-	collection.ListRule = types.Pointer("@request.auth.id = '' || @request.auth.id = user")
-	collection.ViewRule = types.Pointer("@request.auth.id = '' || @request.auth.id = user")
-	collection.CreateRule = types.Pointer("@request.auth.id = '' || @request.auth.id = user")
-	collection.UpdateRule = types.Pointer("@request.auth.id = '' || @request.auth.id = user")
-	collection.DeleteRule = types.Pointer("@request.auth.id = '' || @request.auth.id = user")
+	collection.ListRule = types.Pointer("@request.auth.id = user")
+	collection.ViewRule = types.Pointer("@request.auth.id = user")
+	collection.CreateRule = types.Pointer("@request.auth.id = user || @request.auth.id = ''")
+	collection.UpdateRule = types.Pointer("@request.auth.id = user")
+	collection.DeleteRule = types.Pointer("@request.auth.id = user")
 
 	return app.Save(collection)
 }
@@ -76,6 +76,21 @@ func removeActivityAPIRules(app core.App) error {
 }
 
 // Hooks -----------------------------------------------------------------------
+
+func injectActivityUserHookBind(app core.App) {
+	app.OnRecordCreateRequest("activities").Bind(&hook.Handler[*core.RecordRequestEvent]{
+		Id: "activities-onCreateRequest_injectUser",
+		Func: func(e *core.RecordRequestEvent) error {
+			e.Record.Set("user", e.Auth.Id)
+
+			return e.Next()
+		},
+	})
+}
+
+func injectActivityUserHookUnbind(app core.App) {
+	app.OnRecordCreateRequest("activities").Unbind("activities-onCreateRequest_injectUser")
+}
 
 func createActivityEntryHookBind(app core.App) {
 	app.OnRecordAfterCreateSuccess("activities").Unbind("activities_onCreate")
@@ -770,6 +785,7 @@ func init() {
 
 			// Hooks
 			{ // Activities
+				injectActivityUserHookBind(app)
 				createActivityEntryHookBind(app)
 				preventActivityOwnerChangeHookBind(app)
 				changeActivityTypeHookBind(app)
@@ -853,6 +869,7 @@ func init() {
 
 			// Hooks
 			{ // Activities
+				injectActivityUserHookUnbind(app)
 				createActivityEntryHookUnbind(app)
 				preventActivityOwnerChangeHookUnbind(app)
 				changeActivityTypeHookUnbind(app)

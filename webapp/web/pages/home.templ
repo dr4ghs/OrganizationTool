@@ -1,24 +1,21 @@
 package pages
 
 import "github.com/dr4ghs/orgtool/webapp/web/template"
+import "github.com/dr4ghs/orgtool/webapp/web/components/sidebar"
+import "github.com/dr4ghs/orgtool/webapp/web/components/activities"
 
 templ Home() {
   @template.Base() {
-    <div class="relative">
-      <div
-        hx-get='/home/activities'
-        hx-trigger='load once'
-        hx-swap='outerHTML'
-      ></div>
-      <button 
-        hx-get='/' 
-        hx-target='#content' 
-        hx-swap='outerHTML'
-        hx-push-url='true'
-        hx-on::before-request='OrgTool.logout()'
-      >
-        Logout
-      </button>
+    <div class="flex">
+      <!-- SIDEBAR -->
+      @sidebar.Sidebar()
+
+      <!-- CONTENT -->
+      <div id="home-content" class="ml-96 flex-1 h-screen overflow-auto p-6">
+        @activities.Pane()
+      </div>
+
+      <!-- NOTIFICATIONS -->
       <div id="notifications"
            class="flex flex-col-reverse absolute p-1 top-0 right-0 z-50 w-full sm:w-96 h-screen">
       </div>

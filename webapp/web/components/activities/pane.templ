@@ -1,0 +1,10 @@
+package activities
+
+templ Pane() {
+  <h1 class="pb-6 text-on-surface text-bold text-center text-5xl border-b border-white/20">Tasks</h1>
+  <div
+    hx-get='/home/activities'
+    hx-trigger='load once'
+    hx-swap='outerHTML'
+  ></div>
+}

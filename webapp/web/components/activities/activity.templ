@@ -17,11 +17,13 @@ var (
   ActivityBaseCard = 
     base.Card.Copy().
       Type(base.Surface).
-      AddOuterClass("relative block flex-initial text-on-surface mb-2")
+      AddOuterClass("relative block flex-initial text-on-surface mb-4")
 
   AddActivityCard =
     base.Card.Copy().
-      AddOuterClass("w-full sm:w-3/5 cursor-pointer text-on-surface").
+      Rounded().
+      All(base.RoundedFull).
+      AddOuterClass("cursor-pointer text-on-surface").
       AddInnerClass("transition duration-150 ease-in-out group-hover:opacity-10")
 )
 

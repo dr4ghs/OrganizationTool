@@ -1,0 +1,60 @@
+package sidebar
+
+import "github.com/dr4ghs/orgtool/webapp/web/components/base"
+
+var SidebarBuilder =
+  base.New().
+    Type(base.Surface).
+    Elevation(24).
+    Shadow().
+    AddOuterClass("flex flex-col w-full h-full")
+
+templ Header() {
+  <div class="flex flex-row flex-none p-4 items-center"
+       x-data="{ user: {} }"
+       x-init="requestAnimationFrame(() => user = OrgTool.user())">
+    <h1 class="flex-1 text-2xl">OrgTool</h1>
+    <div class="flex flex-none flex-col px-2">
+      <h1 class="flex-1 text-lg font-normal" x-text="user.name"></h1>
+      <div class="flex flex-row justify-end">
+        <p class="flex-none font-normal" x-text="user.points"></p>
+        <p class="flex-none pl-2 text-sm material-symbols-outlined">toll</p>
+      </div>
+    </div>
+    <div class="group relative flex flex-none w-12 h-12 bg-primary cursor-pointer text-on-primary text-center rounded-full">
+      <div class="absolute -z-10 w-full h-full bg-white"></div>
+      <p class="font-bold m-auto text-xl" x-text="user.name.charAt(0).toUpperCase()"></p>
+    </div>
+  </div>
+}
+
+templ MenuItem(icon string, text string, attrs templ.Attributes) {
+  <button class="flex flex-row mb-1 p-2 w-full rounded-lg transition ease-in-out hover:bg-white/10 justify-center items-center cursor-pointer" { attrs... }>
+    <div class="flex-none w-8 text-left material-symbols-outlined">{ icon }</div>
+    <h1 class="flex-1 text-lg text-left font-bold">{ text }</h1>
+  </button>
+}
+
+templ Sidebar() {
+  <aside id="sidebar"
+         class="fixed top-0 left-0 w-96 h-screen">
+    @base.Component(SidebarBuilder) {
+      @Header()
+      <div class="flex-1 p-4">
+        @MenuItem("menu_book", "Quests", nil)
+        @MenuItem("money_bag", "Inventory", nil)
+        @MenuItem("list", "Tasks", nil)
+        @MenuItem("diamond", "Loots", nil)
+      </div>
+      <div class="flex-none p-4">
+        @MenuItem("settings", "Settings", nil)
+        @MenuItem("logout", "Logout", templ.Attributes{
+          "hx-get": "/",
+          "hx-target": "#content",
+          "hx-push-url": "true",
+          "hx-on::before-request": "OrgTool.logout()",
+        })
+      </div>
+    }
+  </aside>
+}
